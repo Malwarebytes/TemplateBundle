@@ -1,0 +1,24 @@
+{
+    "name":"malwarebytes/template-bundle",
+    "description":"Provides testing mechanisms for easily working with templates outside of a direct application workflow",
+    "homepage":"https://github.mb-internal.com/Licensing/LicensingBundle",
+    "authors": [
+        {
+            "name": "Josh Hall-Bachner",
+            "email": "jhallbachner@malwarebytes.org",
+            "homepage": "http://malwarebytes.org",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/symfony": ">2.3",
+    },
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-0": {
+            "Malwarebytes\\TemplateBundle": ""
+        }
+    },
+    "target-dir":"Malwarebytes/TemplateBundle"
+}
