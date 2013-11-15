@@ -1,0 +1,9 @@
+{% extends 'MalwarebytesAdminBundle:layout:main.html.twig' %}
+
+{% block main %}
+    <div style="letter-spacing: 0px;">
+    {% for template in templates %}
+        {{ template|raw }}
+    {% endfor %}
+    </div>
+{% endblock %}
