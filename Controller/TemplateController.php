@@ -7,7 +7,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Response;
 
-class DefaultController extends Controller
+class TemplateController extends Controller
 {
     /**
      * @Route("/templates")
@@ -21,7 +21,7 @@ class DefaultController extends Controller
 
         $templates = array();
         foreach($tnames as $tname) {
-            $route = $this->get('router')->generate('malwarebytes_template_default_template',
+            $route = $this->get('router')->generate('malwarebytes_template_template_showtemplate',
                 array('template' => $tname)
             );
             $templates[] = "<a href='$route'>$tname</a><br>";
@@ -33,7 +33,7 @@ class DefaultController extends Controller
     /**
      * @Route("/template/{template}", requirements={"template" = ".+"})
      */
-    public function templateAction($template)
+    public function showTemplateAction($template)
     {
         $twig = $this->get('twig');
 

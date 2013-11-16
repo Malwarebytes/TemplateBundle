@@ -7,11 +7,16 @@
 
     <parameters>
         <parameter key="malwarebytes_template.catalog.class">Malwarebytes\TemplateBundle\Service\TemplateCatalog</parameter>
+        <parameter key="malwarebytes_template.twig.extension.class">Malwarebytes\TemplateBundle\Twig\TemplateBundleExtension</parameter>
     </parameters>
 
     <services>
         <service id="malwarebytes_template.catalog" class="%malwarebytes_template.catalog.class%">
             <argument type="service" id="twig" />
+        </service>
+
+        <service id="malwarebytes_template.twig.extension" class="%malwarebytes_template.twig.extension.class%">
+            <tag name="twig.extension" />
         </service>
     </services>
 

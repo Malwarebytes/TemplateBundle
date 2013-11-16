@@ -10,6 +10,8 @@ class TemplateCatalog
 {
     protected $twig;
 
+    protected $templateData;
+
     public function __construct(Twig_Environment $twig)
     {
         $this->twig = $twig;
@@ -36,6 +38,9 @@ class TemplateCatalog
                     $templatename = "@$namespace$localpath/" . $file->getFilename();
 
                     $templates[] = $templatename;
+//                    if($templatename == '@MalwarebytesTemplate/Test/base-example.html.twig') {
+                        var_dump($this->twig->parse($this->twig->tokenize($file->getContents())));
+//                    }
                 }
             }
         }
