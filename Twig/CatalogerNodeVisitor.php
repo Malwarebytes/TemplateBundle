@@ -10,13 +10,17 @@ use Twig_NodeVisitorInterface,
     Twig_Node_Expression_GetAttr,
     Twig_Node_Expression_Constant,
     Twig_Node_Expression_AssignName,
-    Twig_Node_For;
+    Twig_Node_For,
+    Twig_Node_Include,
+    Twig_Node_Expression_Array;
 
 class CatalogerNodeVisitor implements Twig_NodeVisitorInterface
 {
     protected $variables = array();
     protected $elements = array();
     protected $loops = array();
+    protected $includes = array();
+    protected $parent;
     protected $inModule = false;
     protected $memberStack = array();
     protected $loopStack = array();
@@ -25,6 +29,10 @@ class CatalogerNodeVisitor implements Twig_NodeVisitorInterface
     {
         switch(true) {
             case ($node instanceof Twig_Node_Module && !$this->inModule):
+                $parent = $node->getNode('parent');
+                if($parent && $parent instanceof Twig_Node_Expression_Constant) {
+                    $this->parent = $parent->getAttribute('value');
+                }
                 $this->variables = array();
                 $this->inModule = true;
                 break;
@@ -63,6 +71,41 @@ class CatalogerNodeVisitor implements Twig_NodeVisitorInterface
                 }
                 array_push($this->loopStack, $loop);
                 break;
+            case ($node instanceof Twig_Node_Include):
+                $include = array();
+
+                $expr = $node->getNode('expr');
+                if($expr && $expr instanceof Twig_Node_Expression_Constant) {
+                    $include['templates'] = array($expr->getAttribute('value'));
+                } elseif($expr instanceof Twig_Node_Expression_Array) {
+                    $pairs = $expr->getKeyValuePairs();
+                    foreach($pairs as $pair) {
+                        if($pair['value'] instanceof Twig_Node_Expression_Constant) {
+                            $include['templates'][] = $pair['value']->getAttribute('value');
+                        }
+                    }
+                }
+
+                $vars = $node->getNode('variables');
+                if($vars && $vars instanceof Twig_Node_Expression_Array) {
+                    $pairs = $vars->getKeyValuePairs();
+                    foreach($pairs as $pair) {
+                        if($pair['value'] instanceof Twig_Node_Expression_Name
+                           && $pair['key'] instanceof Twig_Node_Expression_Constant) {
+                            $include['forwards'][] = array(
+                                'source' => $pair['value']->getAttribute('name'),
+                                'target' => $pair['key']->getAttribute('value')
+                            );
+                        }
+                    }
+                }
+
+                if(isset($include['forwards'])) {
+                    $node->setAttribute('forwards', $include['forwards']);
+                }
+
+                $this->includes[] = $include;
+                break;
         }
 
         return $node;
@@ -75,10 +118,16 @@ class CatalogerNodeVisitor implements Twig_NodeVisitorInterface
                 $node->setAttribute('symbols', $this->variables);
                 $node->setAttribute('elements', $this->elements);
                 $node->setAttribute('loops', $this->loops);
+                $node->setAttribute('includes', $this->includes);
+                if(isset($this->parent)) {
+                    $node->setAttribute('parent', $this->parent);
+                }
                 $this->inModule = false;
                 $this->variables = array();
                 $this->elements = array();
                 $this->loops = array();
+                $this->includes = array();
+                unset($this->parent);
                 break;
             case ($node instanceof Twig_Node_Expression_GetAttr && count($this->memberStack) > 0):
                 array_shift($this->memberStack);

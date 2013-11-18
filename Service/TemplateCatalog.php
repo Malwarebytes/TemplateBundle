@@ -37,14 +37,33 @@ class TemplateCatalog
                     $localpath = substr($file->getPath(), strlen($path));
                     $templatename = "@$namespace$localpath/" . $file->getFilename();
 
-                    $templates[] = $templatename;
-//                    if($templatename == '@MalwarebytesTemplate/Test/base-example.html.twig') {
+                    if(strpos($templatename, '@MalwarebytesTemplate') === 0) {
                         var_dump($this->twig->parse($this->twig->tokenize($file->getContents())));
-//                    }
+                    }
+
+                    $templates[] = $templatename;
                 }
             }
         }
 
+
+
         return $templates;
+    }
+
+    public function getTemplateData($template)
+    {
+        $loader = $this->twig->getLoader();
+        $t = $loader->getSource($template);
+
+        $tree = $this->twig->parse($this->twig->tokenize($t));
+
+        $atts = array(
+            'variables' => $tree->getAttribute('symbols'),
+            'elements'  => $tree->getAttribute('elements'),
+            'loops'     => $tree->getAttribute('loops'),
+        );
+
+        return array($template => $atts);
     }
 }

@@ -3,3 +3,11 @@
 {% for item in list %}
     {{ item.subitem.subsubitem }}
 {% endfor %}
+
+{% block blockname %}
+
+{% endblock %}
+
+{% include 'included-example.html.twig' %}
+
+{% include 'included-context-example.html.twig' with {'contextitem': onlyincontext } %}
