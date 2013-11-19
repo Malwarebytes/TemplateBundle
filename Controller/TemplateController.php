@@ -21,7 +21,7 @@ class TemplateController extends Controller
 
         $templates = array();
         foreach($tnames as $tname) {
-            $route = $this->get('router')->generate('malwarebytes_template_template_showtemplate',
+            $route = $this->get('router')->generate('malwarebytes_template_template_info',
                 array('template' => $tname)
             );
             $templates[] = "<a href='$route'>$tname</a><br>";
@@ -31,7 +31,20 @@ class TemplateController extends Controller
     }
 
     /**
-     * @Route("/template/{template}", requirements={"template" = ".+"})
+     * @Route("template/info/{template}", requirements={"template" = ".+"})
+     * @Template()
+     */
+    public function infoAction($template)
+    {
+        $catalog = $this->get('malwarebytes_template.catalog');
+
+        $info = $catalog->getInfo($template);
+
+        return array('template' => $info, 'topline' => "Info: $template", 'title' => "Template Info: $template");
+    }
+
+    /**
+     * @Route("/template/show/{template}", requirements={"template" = ".+"})
      */
     public function showTemplateAction($template)
     {

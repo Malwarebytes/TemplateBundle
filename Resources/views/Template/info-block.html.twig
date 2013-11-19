@@ -1,0 +1,51 @@
+<style>
+    table {
+        letter-spacing: 0px;
+        width: 100%;
+    }
+    .tg-table-light { border-collapse: collapse; border-spacing: 0; }
+    .tg-table-light td, .tg-table-light th { background-color: #fff; border: 1px #bbb solid; color: #333; font-family: sans-serif; font-size: 100%; padding: 10px; vertical-align: top; }
+    .tg-table-light .tg-sub td  { background-color: #eee; }
+    .tg-table-light th  { background-color: #ddd; color: #333; font-size: 110%; font-weight: bold; }
+    .tg-table-light tr:hover td, .tg-table-light tr.even:hover td  { color: #222; background-color: #FCFBE3; }
+    .tg-bf { font-weight: bold; } .tg-it { font-style: italic; }
+    .tg-left { text-align: left; } .tg-right { text-align: right; } .tg-center { text-align: center; }
+</style>
+
+<table class="tg-table-light">
+    <tr>
+        <th colspan="2">{{ template.name }}</th>
+    </tr>
+    {% if template.parent is not null %}
+        <tr class="tg-sub tg-center">
+            <td colspan="2"><b>Parent</b></td>
+        </tr>
+        <tr class="tg-center">
+            <td colspan="2"><a href="{{ path('malwarebytes_template_template_info', {'template': template.parent} ) }}">{{ template.parent }}</a></td>
+        </tr>
+    {% endif %}
+    {% if template.expressions|length > 0 %}
+        <tr class="tg-sub tg-center">
+            <td colspan="2"><b>Expressions</b></td>
+        </tr>
+        <tr>
+            <td colspan="2"><pre>{{ template.expressions|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre></td>
+        </tr>
+    {% endif %}
+    {% if template.loops|length > 0 %}
+        <tr class="tg-sub tg-center">
+            <td colspan="2"><b>Loops</b></td>
+        </tr>
+        <tr>
+            <td colspan="2"><pre>{{ template.loops|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre></td>
+        </tr>
+    {% endif %}
+    {% if template.includes|length > 0 %}
+        <tr class="tg-sub tg-center">
+            <td colspan="2"><b>Includes</b></td>
+        </tr>
+        <tr>
+            <td colspan="2"><pre>{{ template.includes|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre></td>
+        </tr>
+    {% endif %}
+</table>
