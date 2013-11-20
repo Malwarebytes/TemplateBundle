@@ -2,6 +2,14 @@
 
 {% for item in list %}
     {{ item.subitem.subsubitem }}
+
+    {% for nestitem in item.sublist %}
+        {{ nestitem.attribute }}
+    {% endfor %}
+{% endfor %}
+
+{% for alsoitem in list %}
+    {{ alsoitem.attribute }}
 {% endfor %}
 
 {% block blockname %}

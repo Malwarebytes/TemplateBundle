@@ -32,14 +32,6 @@
             <td colspan="2"><pre>{{ template.expressions|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre></td>
         </tr>
     {% endif %}
-    {% if template.loops|length > 0 %}
-        <tr class="tg-sub tg-center">
-            <td colspan="2"><b>Loops</b></td>
-        </tr>
-        <tr>
-            <td colspan="2"><pre>{{ template.loops|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre></td>
-        </tr>
-    {% endif %}
     {% if template.includes|length > 0 %}
         <tr class="tg-sub tg-center">
             <td colspan="2"><b>Includes</b></td>

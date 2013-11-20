@@ -71,41 +71,6 @@ class CatalogerNodeVisitor implements Twig_NodeVisitorInterface
                 }
                 array_push($this->loopStack, $loop);
                 break;
-            case ($node instanceof Twig_Node_Include):
-                $include = array();
-
-                $expr = $node->getNode('expr');
-                if($expr && $expr instanceof Twig_Node_Expression_Constant) {
-                    $include['templates'] = array($expr->getAttribute('value'));
-                } elseif($expr instanceof Twig_Node_Expression_Array) {
-                    $pairs = $expr->getKeyValuePairs();
-                    foreach($pairs as $pair) {
-                        if($pair['value'] instanceof Twig_Node_Expression_Constant) {
-                            $include['templates'][] = $pair['value']->getAttribute('value');
-                        }
-                    }
-                }
-
-                $vars = $node->getNode('variables');
-                if($vars && $vars instanceof Twig_Node_Expression_Array) {
-                    $pairs = $vars->getKeyValuePairs();
-                    foreach($pairs as $pair) {
-                        if($pair['value'] instanceof Twig_Node_Expression_Name
-                           && $pair['key'] instanceof Twig_Node_Expression_Constant) {
-                            $include['forwards'][] = array(
-                                'source' => $pair['value']->getAttribute('name'),
-                                'target' => $pair['key']->getAttribute('value')
-                            );
-                        }
-                    }
-                }
-
-                if(isset($include['forwards'])) {
-                    $node->setAttribute('forwards', $include['forwards']);
-                }
-
-                $this->includes[] = $include;
-                break;
         }
 
         return $node;
@@ -159,10 +124,59 @@ class CatalogerNodeVisitor implements Twig_NodeVisitorInterface
                 $node->setAttribute('loopAttributes', end($this->loopStack));
                 array_push($this->loops, array_pop($this->loopStack));
                 break;
+            case ($node instanceof Twig_Node_Include):
+                $include = array();
+
+                $expr = $node->getNode('expr');
+                if($expr && $expr instanceof Twig_Node_Expression_Constant) {
+                    $include['templates'] = array($expr->getAttribute('value'));
+                } elseif($expr instanceof Twig_Node_Expression_Array) {
+                    $pairs = $expr->getKeyValuePairs();
+                    foreach($pairs as $pair) {
+                        if($pair['value'] instanceof Twig_Node_Expression_Constant) {
+                            $include['templates'][] = $pair['value']->getAttribute('value');
+                        }
+                    }
+                }
+
+                $vars = $node->getNode('variables');
+                if($vars && $vars instanceof Twig_Node_Expression_Array) {
+                    $pairs = $vars->getKeyValuePairs();
+                    foreach($pairs as $pair) {
+                        if(!$pair['value'] instanceof Twig_Node_Expression_Constant) {
+                            $include['forwards'][] = array(
+                                'source' => $this->getIdentifierOfNode($pair['value']),
+                                'target' => $this->getIdentifierOfNode($pair['key'])
+                            );
+                        }
+                    }
+                }
+
+                if(isset($include['forwards'])) {
+                    $node->setAttribute('forwards', $include['forwards']);
+                }
+
+                $this->includes[] = $include;
+                break;
         }
 
         return $node;
     }
+
+    protected function getIdentifierOfNode($node)
+    {
+        switch(true) {
+            case($node instanceof Twig_Node_Expression_Name):
+                return $node->getAttribute('name');
+            case($node instanceof Twig_Node_Expression_Constant):
+                return '<<' . $node->getAttribute('value') . '>>';
+            case($node instanceof Twig_Node_Expression_GetAttr):
+                return $node->getAttribute('attributeChain');
+            default:
+                return '';
+        }
+    }
+
 
     public function getPriority()
     {
