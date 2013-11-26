@@ -46,6 +46,16 @@ class TemplateCatalog
 
     public function getInfo($template)
     {
+        $info = $this->getLocalInfo($template);
+        $info = $this->getParentInfo($template, $info);
+        $info = $this->getIncludeInfo($template, $info);
+
+var_dump($info);
+        return $info;
+    }
+
+    protected function getLocalInfo($template)
+    {
         $loader = $this->twig->getLoader();
         $t = $loader->getSource($template);
 
@@ -77,6 +87,44 @@ class TemplateCatalog
         );
 
         return $atts;
+    }
+
+    protected function getParentInfo($template, $info)
+    {
+        if(!isset($info['parent'])) {
+            return $info;
+        }
+
+        $parent = $this->getLocalInfo($info['parent']);
+        $parent = $this->getIncludeInfo($info['parent'], $parent);
+
+        if(isset($parent['parent'])) {
+            $parent = $this->getParentInfo($parent['parent'], $parent);
+        }
+
+        $info['parentinfo'] = $parent;
+
+        return $info;
+    }
+
+    protected function getIncludeInfo($template, $info, $covered = array())
+    {
+        if(!in_array($template, $covered)) {
+            $covered[] = $template;
+
+            if(isset($info['includes'])) {
+
+                foreach($info['includes'] as &$include) {
+                    foreach($include['templates'] as $inctemplate) {
+                        $incinfo = $this->getLocalInfo($inctemplate);
+                        $incinfo = $this->getParentInfo($inctemplate, $incinfo);
+                        $include['info'][$inctemplate] = $this->getIncludeInfo($inctemplate, $incinfo, $covered);
+                    }
+                }
+            }
+        }
+
+        return $info;
     }
 
     protected function normalizeTemplateName($source, $name)
