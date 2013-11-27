@@ -50,7 +50,7 @@ class TemplateCatalog
         $info = $this->getParentInfo($template, $info);
         $info = $this->getIncludeInfo($template, $info);
 
-var_dump($info);
+
         return $info;
     }
 

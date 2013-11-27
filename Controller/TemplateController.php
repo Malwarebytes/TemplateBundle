@@ -40,7 +40,9 @@ class TemplateController extends Controller
 
         $info = $catalog->getInfo($template);
 
-        return array('template' => $info, 'topline' => "Info: $template", 'title' => "Template Info: $template");
+        $form = $this->createForm('template', array('template' => $template));
+
+        return array('template' => $info, 'topline' => "Info: $template", 'title' => "Template Info: $template", 'form' => $form->createView());
     }
 
     /**
