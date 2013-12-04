@@ -23,11 +23,28 @@ class TemplateDataFormType extends AbstractType
         $build = function($tree, $prefix = '') use (&$build) {
             $fields = array();
 
+            while(isset($tree['parentinfo'])) {
+                $pi = $tree['parentinfo'];
+                unset($tree['parentinfo']);
+                $tree = array_merge_recursive($tree, $pi);
+            }
+
+            while(isset($tree['includes'])) {
+                $includedata = array();
+                foreach($tree['includes'] as $include) {
+                    foreach($include['info'] as $info) {
+                        $includedata = array_merge_recursive($includedata, $info);
+                    }
+                }
+                unset($tree['includes']);
+                $tree = array_merge_recursive($tree, $includedata);
+            }
+
             foreach(array('expressions', 'members', 'items') as $sub) {
 
                 if(isset($tree[$sub])) {
                     foreach($tree[$sub] as $name => $value) {
-                        if(count($value) == 0) {
+                        if((count($value) == 0) || isset($value['forwarded'])) {
                             $n = $prefix . $name;
                             if($sub === 'items') {
                                 $n .= '---';

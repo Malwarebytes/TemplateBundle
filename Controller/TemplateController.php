@@ -97,7 +97,7 @@ class TemplateController extends Controller
                 }
             }
         }
-var_dump($fields);
+
         return $fields;
     }
 }
