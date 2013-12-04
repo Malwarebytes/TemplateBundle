@@ -1,0 +1,31 @@
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+.header, .footer {
+    width: 100%;
+    height: 100px;
+    background-color: #368CEB;
+    margin: 0;
+    padding: 0;
+}
+
+.body {
+    width: 960px;
+    margin: 15px auto;
+    font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
+}
+
+form {
+    margin: 10px 0;
+}
+
+form label {
+    height: 1.3em;
+    display: block;
+}
+
+form input {
+    width: 250px;
+}
