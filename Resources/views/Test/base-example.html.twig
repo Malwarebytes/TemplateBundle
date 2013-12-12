@@ -1,6 +1,9 @@
 {# this is a comment; we want to see if twig parses it in any way #}
 
-{% metadata %}
+{# this comment includes annotations
+    @Field(name="greeting", contents="hello")
+    @Field(name="name", contents="jhb")
+#}
 
 {{ greeting }} {{ name }}! This is an {{ environment.emotion }} test of the template scanning system.
 

@@ -6,23 +6,42 @@
 
 
     <parameters>
-        <parameter key="malwarebytes_template.catalog.class">Malwarebytes\TemplateBundle\Service\TemplateCatalog</parameter>
-        <parameter key="malwarebytes_template.twig.extension.class">Malwarebytes\TemplateBundle\Twig\TemplateBundleExtension</parameter>
+        <parameter key="malwarebytes_template.annotation.parser.class">Malwarebytes\TemplateBundle\Parser\AnnotationParser</parameter>
+        <parameter key="malwarebytes_template.catalog.class">Malwarebytes\TemplateBundle\Catalog\TemplateCatalog</parameter>
         <parameter key="malwarebytes_template.form.class">Malwarebytes\TemplateBundle\Form\TemplateDataFormType</parameter>
+        <parameter key="malwarebytes_template.twig.extension.class">Malwarebytes\TemplateBundle\Twig\TemplateBundleExtension</parameter>
+        <parameter key="malwarebytes_template.twig.lexer.comment.class">Malwarebytes\TemplateBundle\Twig\CommentLexer</parameter>
+        <parameter key="malwarebytes_template.twig.parser.comment.class">Malwarebytes\TemplateBundle\Twig\CommentParser</parameter>
     </parameters>
 
     <services>
+        <service id="malwarebytes_template.annotation.parser" class="%malwarebytes_template.annotation.parser.class%">
+        </service>
+
         <service id="malwarebytes_template.catalog" class="%malwarebytes_template.catalog.class%">
             <argument type="service" id="twig" />
+            <argument type="service" id="malwarebytes_template.twig.lexer.comment" />
+            <argument type="service" id="malwarebytes_template.twig.parser.comment" />
+        </service>
+
+        <service id="malwarebytes_template.form" class="%malwarebytes_template.form.class%">
+            <argument type="service" id="malwarebytes_template.catalog" />
+            <tag name="form.type" alias="template" />
         </service>
 
         <service id="malwarebytes_template.twig.extension" class="%malwarebytes_template.twig.extension.class%">
             <tag name="twig.extension" />
         </service>
 
-        <service id="malwarebytes_template.form" class="%malwarebytes_template.form.class%">
-            <argument type="service" id="malwarebytes_template.catalog" />
-            <tag name="form.type" alias="template" />
+        <service id="malwarebytes_template.twig.lexer.comment" class="%malwarebytes_template.twig.lexer.comment.class%">
+            <argument type="service" id="twig" />
+        </service>
+
+        <service id="malwarebytes_template.twig.parser.comment" class="%malwarebytes_template.twig.parser.comment.class%">
+            <argument type="service" id="twig" />
+            <call method="setAnnotationParser">
+                <argument type="service" id="malwarebytes_template.annotation.parser" />
+            </call>
         </service>
     </services>
 

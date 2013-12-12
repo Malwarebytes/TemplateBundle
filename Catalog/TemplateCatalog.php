@@ -1,20 +1,30 @@
 <?php
 
-namespace Malwarebytes\TemplateBundle\Service;
+namespace Malwarebytes\TemplateBundle\Catalog;
 
 use Symfony\Component\Finder\Finder;
-use Twig_Environment,
-    Twig_Loader_Filesystem;
+use Twig_Environment;
+use Twig_Loader_Filesystem;
+use Twig_Lexer;
+use Twig_Parser;
 
 class TemplateCatalog
 {
     protected $twig;
+    protected $lexer;
+    protected $defaultLexer;
+    protected $parser;
+    protected $defaultParser;
 
     protected $templateData;
 
-    public function __construct(Twig_Environment $twig)
+    public function __construct(Twig_Environment $twig, Twig_Lexer $lexer, Twig_Parser $parser)
     {
         $this->twig = $twig;
+        $this->lexer = $lexer;
+        $this->defaultLexer = $twig->getLexer();
+        $this->parser = $parser;
+        $this->defaultParser = $twig->getParser();
     }
 
     public function getTemplates()
@@ -50,12 +60,14 @@ class TemplateCatalog
         $info = $this->getParentInfo($template, $info);
         $info = $this->getIncludeInfo($template, $info);
 
-
         return $info;
     }
 
     protected function getLocalInfo($template)
     {
+        $this->twig->setLexer($this->lexer);
+        $this->twig->setParser($this->parser);
+
         $loader = $this->twig->getLoader();
         $t = $loader->getSource($template);
 
@@ -85,6 +97,9 @@ class TemplateCatalog
             'includes'      => $includes,
             'name'          => $template,
         );
+
+        $this->twig->setLexer($this->defaultLexer);
+        $this->twig->setParser($this->defaultParser);
 
         return $atts;
     }

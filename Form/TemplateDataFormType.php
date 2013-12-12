@@ -2,7 +2,7 @@
 
 namespace Malwarebytes\TemplateBundle\Form;
 
-use Malwarebytes\TemplateBundle\Service\TemplateCatalog;
+use Malwarebytes\TemplateBundle\Catalog\TemplateCatalog;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormBuilderInterface;
