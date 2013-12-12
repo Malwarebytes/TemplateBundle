@@ -2,17 +2,18 @@
 
 namespace Malwarebytes\TemplateBundle\Twig;
 
-use Twig_NodeVisitorInterface,
-    Twig_NodeInterface,
-    Twig_Environment,
-    Twig_Node_Module,
-    Twig_Node_Expression_Name,
-    Twig_Node_Expression_GetAttr,
-    Twig_Node_Expression_Constant,
-    Twig_Node_Expression_AssignName,
-    Twig_Node_For,
-    Twig_Node_Include,
-    Twig_Node_Expression_Array;
+use Malwarebytes\TemplateBundle\Twig\MetadataNode;
+use Twig_NodeVisitorInterface;
+use Twig_NodeInterface;
+use Twig_Environment;
+use Twig_Node_Module;
+use Twig_Node_Expression_Name;
+use Twig_Node_Expression_GetAttr;
+use Twig_Node_Expression_Constant;
+use Twig_Node_Expression_AssignName;
+use Twig_Node_For;
+use Twig_Node_Include;
+use Twig_Node_Expression_Array;
 
 class CatalogerNodeVisitor implements Twig_NodeVisitorInterface
 {
@@ -20,6 +21,7 @@ class CatalogerNodeVisitor implements Twig_NodeVisitorInterface
     protected $elements = array();
     protected $loops = array();
     protected $includes = array();
+    protected $defaults = array();
     protected $parent;
     protected $inModule = false;
     protected $memberStack = array();
@@ -71,6 +73,13 @@ class CatalogerNodeVisitor implements Twig_NodeVisitorInterface
                 }
                 array_push($this->loopStack, $loop);
                 break;
+            case ($node instanceof MetadataNode):
+                $ann = $node->getAttribute('annotation');
+                $default = array('contents' => $ann->getContents(), 'type' => $ann->getType(), 'required' => $ann->getRequired());
+                if(count($default) > 0) {
+                    $this->defaults[$ann->getName()] = $default;
+                }
+                break;
         }
 
         return $node;
@@ -84,6 +93,7 @@ class CatalogerNodeVisitor implements Twig_NodeVisitorInterface
                 $node->setAttribute('elements', $this->elements);
                 $node->setAttribute('loops', $this->loops);
                 $node->setAttribute('includes', $this->includes);
+                $node->setAttribute('defaults', $this->defaults);
                 if(isset($this->parent)) {
                     $node->setAttribute('parent', $this->parent);
                 }
@@ -92,6 +102,7 @@ class CatalogerNodeVisitor implements Twig_NodeVisitorInterface
                 $this->elements = array();
                 $this->loops = array();
                 $this->includes = array();
+                $this->defaults = array();
                 unset($this->parent);
                 break;
             case ($node instanceof Twig_Node_Expression_GetAttr && count($this->memberStack) > 0):

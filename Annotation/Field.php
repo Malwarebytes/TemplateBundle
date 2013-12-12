@@ -10,6 +10,7 @@ class Field
     protected $name;
     protected $contents;
     protected $type;
+    protected $required = true;
 
     public function __construct($data)
     {
@@ -68,5 +69,21 @@ class Field
     public function getType()
     {
         return $this->type;
+    }
+
+    /**
+     * @param mixed $required
+     */
+    public function setRequired($required)
+    {
+        $this->required = $required;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRequired()
+    {
+        return $this->required;
     }
 }

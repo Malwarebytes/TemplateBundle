@@ -63,7 +63,20 @@ class TemplateDataFormType extends AbstractType
                 }
             }
 
-            return $fields;
+            if($prefix === '') {
+                $fullfields = array();
+                foreach($fields as $field) {
+                    if(isset($tree['defaults'][$field])) {
+                        $fullfields[$field] = $tree['defaults'][$field];
+                    } else {
+                        $fullfields[$field] = array();
+                    }
+                }
+
+                return $fullfields;
+            } else {
+                return $fields;
+            }
         };
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function(FormEvent $event) use ($build) {
@@ -76,8 +89,35 @@ class TemplateDataFormType extends AbstractType
 
             $fields = $build($info);
 
-            foreach($fields as $field) {
-                $form->add($field, 'text', array('label' => $field));
+            if(isset($info['defaults'])) {
+                foreach($info['defaults'] as $name => $default) {
+                    $settings = array('data' => $default['contents']);
+                    $type = 'hidden';
+                    $fieldname = '-:-' . $name;
+
+                    $form->add($fieldname, $type, $settings);
+
+                    foreach($fields as $field => $default) {
+                        if(strpos($field, $name) === 0) {
+                            unset($fields[$field]);
+                        }
+                    }
+                }
+            }
+
+            foreach($fields as $field => $default) {
+                $settings = array('label' => $field);
+                if(isset($default['required'])) {
+                    $settings['required'] = $default['required'];
+                }
+                $type = 'text';
+                if(isset($default['contents'])) {
+                    if(!isset($default['type']) || $default['type'] !== 'form') {
+                        $settings['data'] = $default['contents'];
+                    }
+                }
+
+                $form->add($field, $type, $settings);
             }
 
             $form->add('render', 'submit', array('label' => 'Render Template'));

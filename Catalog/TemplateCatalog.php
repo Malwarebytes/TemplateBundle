@@ -96,6 +96,7 @@ class TemplateCatalog
                     : null,
             'includes'      => $includes,
             'name'          => $template,
+            'defaults'      => $tree->hasAttribute('defaults') ? $tree->getAttribute('defaults') : null
         );
 
         $this->twig->setLexer($this->defaultLexer);
