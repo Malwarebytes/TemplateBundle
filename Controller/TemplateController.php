@@ -72,28 +72,49 @@ class TemplateController extends Controller
                 continue;
             }
 
-            $steps = explode(':', $name);
-            $point = &$fields;
+            if(strpos($name, '-:-') !== false) {
+                $pieces = explode('-:-', $name);
+                $type = array_shift($pieces);
+                $data = array_pop($pieces);
 
-            while(($item = array_shift($steps)) !== null) {
-                $member = (strpos($item, '---') === false) ? false : true;
-                if($member) {
-                    $item = '---';
+                switch($type) {
+                    case 'service':
+                        $fields[$data] = $this->get($value);
+                        break;
+
+                    case 'form':
+                        // placeholder
+
+                        break;
+
+                    default:
+                        throw new \InvalidArgumentException('An invalid type of contents was provided for field "' . $name . '"');
                 }
 
-                if(count($steps) == 0) {
+            } else {
+                $steps = explode(':', $name);
+                $point = &$fields;
+
+                while(($item = array_shift($steps)) !== null) {
+                    $member = (strpos($item, '---') === false) ? false : true;
                     if($member) {
-                        $point[0] = $value;
-                        $point[1] = $value;
-                        $point[2] = $value;
-                    } else {
-                        $point[$item] = $value;
+                        $item = '---';
                     }
-                } elseif(isset($point[$item]) && is_array($point[$item])) {
-                    $point = &$point[$item];
-                } elseif(!isset($point[$item])) {
-                    $point[$item] = array();
-                    $point = &$point[$item];
+
+                    if(count($steps) == 0) {
+                        if($member) {
+                            $point[0] = $value;
+                            $point[1] = $value;
+                            $point[2] = $value;
+                        } else {
+                            $point[$item] = $value;
+                        }
+                    } elseif(isset($point[$item]) && is_array($point[$item])) {
+                        $point = &$point[$item];
+                    } elseif(!isset($point[$item])) {
+                        $point[$item] = array();
+                        $point = &$point[$item];
+                    }
                 }
             }
         }

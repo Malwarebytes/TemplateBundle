@@ -92,14 +92,16 @@ class TemplateDataFormType extends AbstractType
             if(isset($info['defaults'])) {
                 foreach($info['defaults'] as $name => $default) {
                     $settings = array('data' => $default['contents']);
-                    $type = 'hidden';
-                    $fieldname = '-:-' . $name;
+                    if($default['type'] !== 'text') {
+                        $type = 'hidden';
+                        $fieldname = $default['type'] . '-:-' . $name;
 
-                    $form->add($fieldname, $type, $settings);
+                        $form->add($fieldname, $type, $settings);
 
-                    foreach($fields as $field => $default) {
-                        if(strpos($field, $name) === 0) {
-                            unset($fields[$field]);
+                        foreach($fields as $field => $default) {
+                            if(strpos($field, $name) === 0) {
+                                unset($fields[$field]);
+                            }
                         }
                     }
                 }
@@ -112,7 +114,7 @@ class TemplateDataFormType extends AbstractType
                 }
                 $type = 'text';
                 if(isset($default['contents'])) {
-                    if(!isset($default['type']) || $default['type'] !== 'form') {
+                    if(!isset($default['type']) || $default['type'] === 'text') {
                         $settings['data'] = $default['contents'];
                     }
                 }
