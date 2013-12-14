@@ -77,9 +77,32 @@ class TemplateController extends Controller
                 $type = array_shift($pieces);
                 $data = array_pop($pieces);
 
+                if(strpos($value, '->') !== false) {
+                    $call = substr($value, strpos($value, '->') + 2);
+                    $value = substr($value, 0, strpos($value, '->'));
+
+                    $matches = array();
+                    preg_match("/\\(\\s*'([^']+)'\\s*\\)|\\(\\s*('([^']+)',\\s*)+'([^']+)'\\s*\\)/", $call, $matches);
+                    if(count($matches > 0)) {
+                        $params = array();
+                        foreach($matches as $match) {
+                            if( (strpos($match, "'") !== 0) && (strpos($match, "(") !== 0) && strlen($match) > 0) {
+                                $params[] = $match;
+                            }
+                        }
+                    }
+                    $call = substr($call, 0, strpos($call, '(')); var_dump($call, $params);
+                }
+
                 switch($type) {
                     case 'service':
-                        $fields[$data] = $this->get($value);
+                        $service = $this->get($value);
+
+                        if(isset($call)) {
+                            $service = call_user_func_array(array($service, $call), $params);
+                        }
+
+                        $fields[$data] = $service;
                         break;
 
                     case 'form':
